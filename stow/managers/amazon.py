@@ -74,10 +74,13 @@ class Amazon(RemoteManager):
             # No object existed at location - check if a directory exists
             if e.response["Error"]["Code"] != "404": raise
 
+            # Construct the query for the owning directory
+            abspath = self.abspath(self.dirname(relpath))
+
             # Get all directories for that level
             dirs = self._clientPaginator.paginate(
                 Bucket=self._bucketName,
-                Prefix=self.abspath(self.dirname(relpath)) + "/",
+                Prefix= abspath + "/" if abspath else "",
                 Delimiter='/'
             )
 

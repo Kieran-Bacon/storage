@@ -144,11 +144,28 @@ class Manager(ABC):
         return art
 
     def __contains__(self, artefact: typing.Union[Artefact, str]):
-        if isinstance(artefact, Artefact): return artefact.manager is self
+
+        if isinstance(artefact, Artefact):
+            relpath = artefact.path
+
+        else:
+            relpath = self.relpath(artefact)
+            artefact = self._paths.get(relpath)
+
         try:
-            self[artefact]
+
+            if not self._isdir(relpath) and artefact is not None:
+                file = self._makefile(relpath)
+                artefact._update(file)
+
             return True
+
         except exceptions.ArtefactNotFound:
+
+            if artefact is not None:
+                # Artefact has been removed from manager
+                self._remove(artefact)
+
             return False
 
     def _add(self, art: Artefact):

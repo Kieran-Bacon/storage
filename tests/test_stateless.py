@@ -1,3 +1,4 @@
+from tempfile import TemporaryDirectory
 import unittest
 
 import os
@@ -102,6 +103,23 @@ class Test_Stateless(unittest.TestCase):
         self.assertEqual(stow.join("./example", "there"), "./example/there")
         self.assertEqual(stow.join("example", "there"), "example/there")
         self.assertEqual(stow.join("example", "/there"), "example/there")
+
+    def test_exists(self):
+
+        with tempfile.TemporaryDirectory() as directory:
+
+            relpath = stow.join(directory, "dirname")
+
+            dirArt = stow.mkdir(relpath)
+
+            self.assertTrue(stow.exists(relpath))
+
+            os.rmdir(os.path.join(directory, "dirname"))
+
+            self.assertFalse(stow.exists(relpath))
+            self.assertFalse(dirArt._exists)
+
+
 
 
 
